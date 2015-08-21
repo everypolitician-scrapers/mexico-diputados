@@ -79,8 +79,8 @@ def scrape_list(url)
     }
     data[:name] = data[:sort_name]
     # }.merge(scrape_person mp_url)
-
-    puts data
+    ScraperWiki.save_sqlite([:id, :term], data)
+    # puts data
   end
 end
 
