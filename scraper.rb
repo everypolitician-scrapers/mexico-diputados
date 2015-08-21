@@ -52,7 +52,7 @@ def scrape_list(url)
   table = noko.xpath('//table[.//td[contains(.,"Entidad")]]').last
 
   party = party_id = nil
-  table.xpath('.//tr').each do |tr|
+  table.xpath('.//tr').each_with_index do |tr, i|
     tds = tr.css('td')
     if tds.size == 1
       if img = tr.css('img/@src').text
@@ -76,11 +76,9 @@ def scrape_list(url)
       area_id: area_id,
       area: area,
       term: '62',
-    }
-    data[:name] = data[:sort_name]
-    # }.merge(scrape_person mp_url)
+    }.merge(scrape_person mp_url)
     ScraperWiki.save_sqlite([:id, :term], data)
-    # puts data
+    puts i if (i % 50).zero?
   end
 end
 
