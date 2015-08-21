@@ -25,8 +25,8 @@ def party_info_for(img)
   return ['Partido Revolucionario Institucional', 'PRI'] if img == 'images/pri01.png'
   return ['Partido Acción Nacional', 'PAN'] if img == 'images/pan.png'
   return ['Partido de la Revolución Democrática', 'PRD'] if img == 'images/prd01.png'
-  return ['Partido Verde Ecologista', 'PVE'] if img == 'images/logvrd.png'
-  return ['Movimiento Ciudadano', 'MC'] if img == 'logo_movimiento_ciudadano.png'
+  return ['Partido Verde Ecologista', 'PVE'] if img == 'images/logvrd.jpg'
+  return ['Movimiento Ciudadano', 'MC'] if img == 'images/logo_movimiento_ciudadano.png'
   return ['Partido del Trabajo', 'PT'] if img == 'images/logpt.jpg'
   return ['Partido Nueva Alianza', 'PANAL'] if img == 'images/panal.gif'
   return ['Movimiento Regeneración Nacional', 'MORENA'] if img == 'images/LogoMorena.jpg'
@@ -76,7 +76,9 @@ def scrape_list(url)
       area_id: area_id,
       area: area,
       term: '62',
-    }.merge(scrape_person mp_url)
+    }
+    data[:name] = data[:sort_name]
+    # }.merge(scrape_person mp_url)
 
     puts data
   end
