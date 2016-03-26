@@ -70,7 +70,7 @@ def scrape_list(url)
 
     data = { 
       id: mp_url.to_s[/dipt=(\d+)/, 1],
-      sort_name: tds[0].text.tidy.sub(/^\d+\s*/, ''),
+      sort_name: tds[0].text.tidy.sub(/^\d+\s*/, '').sub(' (LICENCIA)',''),
       party: party,
       party_id: party_id,
       area_id: area_id,
@@ -85,7 +85,7 @@ end
 def scrape_person(url)
   noko = noko_for(url)
   data = { 
-    name: noko.at_xpath('//td//span[contains(.,"Dip. ")]').text.sub('Dip. ','').tidy,
+    name: noko.at_xpath('//td//span[contains(.,"Dip. ")]').text.sub('Dip. ','').sub(' (LICENCIA)','').tidy,
     image: noko.at_css('img[src*="fotos"]/@src').text, 
     email: noko.xpath('//td[span[contains(.,"Correo")]]/a/@href').text.gsub(/mailto:\s*/,''),
     source: url.to_s,
