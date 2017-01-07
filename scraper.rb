@@ -1,5 +1,6 @@
 #!/bin/env ruby
 # encoding: utf-8
+# frozen_string_literal: true
 
 require 'nokogiri'
 require 'open-uri'
@@ -11,13 +12,12 @@ OpenURI::Cache.cache_path = '.cache'
 
 class String
   def tidy
-    self.gsub(/[[:space:]]+/, ' ').strip
+    gsub(/[[:space:]]+/, ' ').strip
   end
 end
 
 def noko_for(url)
   Nokogiri::HTML(open(url).read)
-  # Nokogiri::HTML(open(url).read, nil, 'utf-8')
 end
 
 def party_info_for(img)
@@ -35,7 +35,7 @@ end
 
 def ocd(entidad, d_c_text)
   d_c, d_c_no = d_c_text.split(/\.\s+/, 2)
-  dc_expanded = { 
+  dc_expanded = {
     'Circ' => 'Circunscripción',
     'Dtto' => 'Distrito',
   }
@@ -43,7 +43,7 @@ def ocd(entidad, d_c_text)
   area_id = 'ocd-division/country:mx/entidad:%s/%s:%s' % [entidad, dc_expanded[d_c], d_c_no].map do |str|
     str.downcase.gsub(/[[:space:]]+/, '-')
   end
-  return [area, area_id]
+  [area, area_id]
 end
 
 def scrape_list(url)
@@ -55,7 +55,7 @@ def scrape_list(url)
     tds = tr.css('td')
     if tds.size == 1
       if img = tr.css('img/@src').text
-        next if img.to_s.empty? 
+        next if img.to_s.empty?
         next if img == 'images/h_line.gif'
         party, party_id = party_info_for(img)
       end
@@ -67,30 +67,30 @@ def scrape_list(url)
 
     area, area_id = ocd(tds[1].text.tidy, tds[2].text.tidy)
 
-    data = { 
-      id: mp_url.to_s[/dipt=(\d+)/, 1],
-      sort_name: tds[0].text.tidy.sub(/^\d+\s*/, '').sub(' (LICENCIA)',''),
-      party: party,
-      party_id: party_id,
-      area_id: area_id,
-      area: area,
-      term: '62',
-    }.merge(scrape_person mp_url)
-    ScraperWiki.save_sqlite([:id, :term], data)
+    data = {
+      id:        mp_url.to_s[/dipt=(\d+)/, 1],
+      sort_name: tds[0].text.tidy.sub(/^\d+\s*/, '').sub(' (LICENCIA)', ''),
+      party:     party,
+      party_id:  party_id,
+      area_id:   area_id,
+      area:      area,
+      term:      '62',
+    }.merge(scrape_person(mp_url))
+    ScraperWiki.save_sqlite(%i(id term), data)
     puts i if (i % 50).zero?
   end
 end
 
 def scrape_person(url)
   noko = noko_for(url)
-  data = { 
-    name: noko.at_xpath('//td//span[contains(.,"Dip. ")]').text.sub('Dip. ','').sub(' (LICENCIA)','').tidy,
-    image: noko.at_css('img[src*="fotos"]/@src').text, 
-    email: noko.xpath('//td[span[contains(.,"Correo")]]/a/@href').text.gsub(/mailto:\s*/,''),
+  data = {
+    name:   noko.at_xpath('//td//span[contains(.,"Dip. ")]').text.sub('Dip. ', '').sub(' (LICENCIA)', '').tidy,
+    image:  noko.at_css('img[src*="fotos"]/@src').text,
+    email:  noko.xpath('//td[span[contains(.,"Correo")]]/a/@href').text.gsub(/mailto:\s*/, ''),
     source: url.to_s,
   }
   data[:image] = URI.join(url, URI.escape(data[:image])).to_s unless data[:image].to_s.empty?
-  return data
+  data
 end
 
 scrape_list('http://sitl.diputados.gob.mx/LXII_leg/listado_diputados_gpnp.php?tipot=TOTAL')
