@@ -70,7 +70,7 @@ def scrape_list(url)
       area:      area,
       term:      '62',
     }.merge(scrape_person(mp_url))
-    ScraperWiki.save_sqlite(%i(id term), data)
+    ScraperWiki.save_sqlite(%i[id term], data)
     puts i if (i % 50).zero?
   end
 end
